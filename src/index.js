@@ -9,10 +9,12 @@ const create = (domElement = window) => {
     emitter.on(name, fn)
     return instance
   }
+
   const once = (name, fn) => {
     emitter.once(name, fn)
     return instance
   }
+
   const off = (name, fn) => {
     emitter.off(name, fn)
     return instance
