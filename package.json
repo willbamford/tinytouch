@@ -7,6 +7,7 @@
     "test": "standard",
     "lint": "standard",
     "fix": "standard --fix",
+    "build": "yarn cjs && yarn umd && yarn min",
     "cjs": "babel src --out-dir lib",
     "umd": "BABEL_ENV=commonjs NODE_ENV=development webpack src/index.js dist/tinytouch.js",
     "min": "BABEL_ENV=commonjs NODE_ENV=production webpack src/index.js dist/tinytouch.min.js"

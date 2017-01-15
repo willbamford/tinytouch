@@ -1,5 +1,6 @@
-const create = (domElement = window) => {
+import Emitter from 'tiny-emitter'
 
+const create = (domElement = window) => {
   const emitter = new Emitter()
   const instance = {}
   const listen = createListen(domElement)
