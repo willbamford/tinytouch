@@ -1,5 +1,11 @@
 import Emitter from 'tiny-emitter'
 
+const createListen = (element) => {
+  return (name, cb) => {
+    element.addEventListener(name, cb)
+  }
+}
+
 const create = (domElement = window) => {
   const emitter = new Emitter()
   const instance = {}
@@ -19,12 +25,6 @@ const create = (domElement = window) => {
   const off = (name, fn) => {
     emitter.off(name, fn)
     return instance
-  }
-
-  const createListen = (element) => {
-    return (name, cb) => {
-      element.addEventListener(name, cb)
-    }
   }
 
   const createEventForMouse = (source) => {

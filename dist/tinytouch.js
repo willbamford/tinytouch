@@ -67,6 +67,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var createListen = function createListen(element) {
+	  return function (name, cb) {
+	    element.addEventListener(name, cb);
+	  };
+	};
+
 	var create = function create() {
 	  var domElement = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window;
 
@@ -88,12 +94,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var off = function off(name, fn) {
 	    emitter.off(name, fn);
 	    return instance;
-	  };
-
-	  var createListen = function createListen(element) {
-	    return function (name, cb) {
-	      element.addEventListener(name, cb);
-	    };
 	  };
 
 	  var createEventForMouse = function createEventForMouse(source) {
