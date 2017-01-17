@@ -42,5 +42,3 @@ Each event has the following properties:
 | `tx`     | Total change in x from initial `DOWN` event (or zero) |
 | `ty`     | Total change in y from initial `DOWN` event (or zero) |
 | `type`   | `Mouse` or `Touch`                                    |
-
-Note `DRAG` is `DOWN` combined with `MOVE`.
