@@ -68,16 +68,19 @@ const create = (domElement = window) => {
     emitter.emit(DOWN, downEvent)
   })
 
-  listen('mousemove', source => {
-    emitter.emit(MOVE, createEventForMouse(source))
-  })
+  const handleMove = (event) => {
+    emitter.emit(MOVE, event)
+    if (downEvent) {
+      emitter.emit(DOWN_MOVE, event)
+    }
+  }
 
-  listen('touchmove', source => {
-    emitter.emit(MOVE, createEventForTouch(source))
-  })
+  listen('mousemove', source => handleMove(createEventForMouse(source)))
+  listen('touchmove', source => handleMove(createEventForTouch(source)))
 
   listen('mouseup', source => {
     emitter.emit(UP, createEventForMouse(source))
+    downEvent = null
   })
 
   listen('touchend', source => {
@@ -106,5 +109,6 @@ export default create
 
 export const DOWN = 'down'
 export const MOVE = 'move'
+export const DOWN_MOVE = 'downMove'
 export const UP = 'up'
 export const CANCEL = 'cancel'

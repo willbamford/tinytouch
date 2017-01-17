@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.CANCEL = exports.UP = exports.MOVE = exports.DOWN = undefined;
+	exports.CANCEL = exports.UP = exports.DOWN_MOVE = exports.MOVE = exports.DOWN = undefined;
 
 	var _tinyEmitter = __webpack_require__(1);
 
@@ -137,16 +137,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    emitter.emit(DOWN, downEvent);
 	  });
 
-	  listen('mousemove', function (source) {
-	    emitter.emit(MOVE, createEventForMouse(source));
-	  });
+	  var handleMove = function handleMove(event) {
+	    emitter.emit(MOVE, event);
+	    if (downEvent) {
+	      emitter.emit(DOWN_MOVE, event);
+	    }
+	  };
 
+	  listen('mousemove', function (source) {
+	    return handleMove(createEventForMouse(source));
+	  });
 	  listen('touchmove', function (source) {
-	    emitter.emit(MOVE, createEventForTouch(source));
+	    return handleMove(createEventForTouch(source));
 	  });
 
 	  listen('mouseup', function (source) {
 	    emitter.emit(UP, createEventForMouse(source));
+	    downEvent = null;
 	  });
 
 	  listen('touchend', function (source) {
@@ -174,6 +181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = create;
 	var DOWN = exports.DOWN = 'down';
 	var MOVE = exports.MOVE = 'move';
+	var DOWN_MOVE = exports.DOWN_MOVE = 'downMove';
 	var UP = exports.UP = 'up';
 	var CANCEL = exports.CANCEL = 'cancel';
 
