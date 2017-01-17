@@ -11,6 +11,7 @@ const create = (domElement = window) => {
   const instance = {}
   const listen = createListen(domElement)
   let downEvent = null
+  let moveEvent = null
 
   const on = (name, fn) => {
     emitter.on(name, fn)
@@ -27,76 +28,72 @@ const create = (domElement = window) => {
     return instance
   }
 
-  const createEventForMouse = (source) => {
-    const x = source.offsetX
-    const y = source.offsetY
+  const isDown = () => !!downEvent
 
+  const createEvent = (source, x, y, type) => {
+    const prevEvent = (moveEvent || downEvent)
     return {
       source,
       x,
       y,
-      dx: downEvent ? x - downEvent.x : 0,
-      dy: downEvent ? y - downEvent.y : 0,
-      type: 'Mouse'
+      dx: prevEvent ? x - prevEvent.x : 0,
+      dy: prevEvent ? y - prevEvent.y : 0,
+      tx: downEvent ? x - downEvent.x : 0,
+      ty: downEvent ? y - downEvent.y : 0,
+      type
     }
+  }
+
+  const createEventForMouse = (source) => {
+    const x = source.offsetX
+    const y = source.offsetY
+    return createEvent(source, x, y, 'Mouse')
   }
 
   const createEventForTouch = (source) => {
     const bounds = source.target.getBoundingClientRect()
     const touch = source.touches.length > 0 ? source.touches[0] : source.changedTouches[0]
-
     const x = touch.clientX - bounds.left
     const y = touch.clientY - bounds.top
-
-    return {
-      source,
-      x,
-      y,
-      dx: downEvent ? x - downEvent.x : 0,
-      dy: downEvent ? y - downEvent.y : 0,
-      type: 'Touch'
-    }
+    return createEvent(source, x, y, 'Touch')
   }
 
-  listen('mousedown', source => {
-    downEvent = createEventForMouse(source)
-    emitter.emit(DOWN, downEvent)
-  })
-
-  listen('touchstart', source => {
-    downEvent = createEventForTouch(source)
-    emitter.emit(DOWN, downEvent)
-  })
+  const handleDown = (event) => {
+    downEvent = event
+    emitter.emit(DOWN, event)
+  }
 
   const handleMove = (event) => {
+    moveEvent = event
     emitter.emit(MOVE, event)
-    if (downEvent) {
+    if (isDown()) {
       emitter.emit(DOWN_MOVE, event)
     }
   }
 
+  const handleUp = (event) => {
+    emitter.emit(UP, event)
+    downEvent = null
+    moveEvent = null
+  }
+
+  const handleCancel = (event) => {
+    emitter.emit(CANCEL, event)
+    downEvent = null
+    moveEvent = null
+  }
+
+  listen('mousedown', source => handleDown(createEventForMouse(source)))
+  listen('touchstart', source => handleDown(createEventForTouch(source)))
+
   listen('mousemove', source => handleMove(createEventForMouse(source)))
   listen('touchmove', source => handleMove(createEventForTouch(source)))
 
-  listen('mouseup', source => {
-    emitter.emit(UP, createEventForMouse(source))
-    downEvent = null
-  })
+  listen('mouseup', source => handleUp(createEventForMouse(source)))
+  listen('touchend', source => handleUp(createEventForTouch(source)))
 
-  listen('touchend', source => {
-    emitter.emit(UP, createEventForTouch(source))
-    downEvent = null
-  })
-
-  listen('mouseout', source => {
-    emitter.emit(CANCEL, createEventForMouse(source))
-    downEvent = null
-  })
-
-  listen('touchcancel', source => {
-    emitter.emit(CANCEL, createEventForTouch(source))
-    downEvent = null
-  })
+  listen('mouseout', source => handleCancel(createEventForMouse(source)))
+  listen('touchcancel', source => handleCancel(createEventForTouch(source)))
 
   instance.on = on
   instance.once = once

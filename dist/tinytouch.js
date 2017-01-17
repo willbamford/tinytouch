@@ -80,6 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var instance = {};
 	  var listen = createListen(domElement);
 	  var downEvent = null;
+	  var moveEvent = null;
 
 	  var on = function on(name, fn) {
 	    emitter.on(name, fn);
@@ -96,53 +97,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return instance;
 	  };
 
-	  var createEventForMouse = function createEventForMouse(source) {
-	    var x = source.offsetX;
-	    var y = source.offsetY;
+	  var isDown = function isDown() {
+	    return !!downEvent;
+	  };
 
+	  var createEvent = function createEvent(source, x, y, type) {
+	    var prevEvent = moveEvent || downEvent;
 	    return {
 	      source: source,
 	      x: x,
 	      y: y,
-	      dx: downEvent ? x - downEvent.x : 0,
-	      dy: downEvent ? y - downEvent.y : 0,
-	      type: 'Mouse'
+	      dx: prevEvent ? x - prevEvent.x : 0,
+	      dy: prevEvent ? y - prevEvent.y : 0,
+	      tx: downEvent ? x - downEvent.x : 0,
+	      ty: downEvent ? y - downEvent.y : 0,
+	      type: type
 	    };
+	  };
+
+	  var createEventForMouse = function createEventForMouse(source) {
+	    var x = source.offsetX;
+	    var y = source.offsetY;
+	    return createEvent(source, x, y, 'Mouse');
 	  };
 
 	  var createEventForTouch = function createEventForTouch(source) {
 	    var bounds = source.target.getBoundingClientRect();
 	    var touch = source.touches.length > 0 ? source.touches[0] : source.changedTouches[0];
-
 	    var x = touch.clientX - bounds.left;
 	    var y = touch.clientY - bounds.top;
-
-	    return {
-	      source: source,
-	      x: x,
-	      y: y,
-	      dx: downEvent ? x - downEvent.x : 0,
-	      dy: downEvent ? y - downEvent.y : 0,
-	      type: 'Touch'
-	    };
+	    return createEvent(source, x, y, 'Touch');
 	  };
 
-	  listen('mousedown', function (source) {
-	    downEvent = createEventForMouse(source);
-	    emitter.emit(DOWN, downEvent);
-	  });
-
-	  listen('touchstart', function (source) {
-	    downEvent = createEventForTouch(source);
-	    emitter.emit(DOWN, downEvent);
-	  });
+	  var handleDown = function handleDown(event) {
+	    downEvent = event;
+	    emitter.emit(DOWN, event);
+	  };
 
 	  var handleMove = function handleMove(event) {
+	    moveEvent = event;
 	    emitter.emit(MOVE, event);
-	    if (downEvent) {
+	    if (isDown()) {
 	      emitter.emit(DOWN_MOVE, event);
 	    }
 	  };
+
+	  var handleUp = function handleUp(event) {
+	    emitter.emit(UP, event);
+	    downEvent = null;
+	    moveEvent = null;
+	  };
+
+	  var handleCancel = function handleCancel(event) {
+	    emitter.emit(CANCEL, event);
+	    downEvent = null;
+	    moveEvent = null;
+	  };
+
+	  listen('mousedown', function (source) {
+	    return handleDown(createEventForMouse(source));
+	  });
+	  listen('touchstart', function (source) {
+	    return handleDown(createEventForTouch(source));
+	  });
 
 	  listen('mousemove', function (source) {
 	    return handleMove(createEventForMouse(source));
@@ -152,23 +169,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 
 	  listen('mouseup', function (source) {
-	    emitter.emit(UP, createEventForMouse(source));
-	    downEvent = null;
+	    return handleUp(createEventForMouse(source));
 	  });
-
 	  listen('touchend', function (source) {
-	    emitter.emit(UP, createEventForTouch(source));
-	    downEvent = null;
+	    return handleUp(createEventForTouch(source));
 	  });
 
 	  listen('mouseout', function (source) {
-	    emitter.emit(CANCEL, createEventForMouse(source));
-	    downEvent = null;
+	    return handleCancel(createEventForMouse(source));
 	  });
-
 	  listen('touchcancel', function (source) {
-	    emitter.emit(CANCEL, createEventForTouch(source));
-	    downEvent = null;
+	    return handleCancel(createEventForTouch(source));
 	  });
 
 	  instance.on = on;
