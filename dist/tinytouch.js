@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.CANCEL = exports.UP = exports.DOWN_MOVE = exports.MOVE = exports.DOWN = undefined;
+	exports.CANCEL = exports.UP = exports.DRAG = exports.MOVE = exports.DOWN = undefined;
 
 	var _tinyEmitter = __webpack_require__(1);
 
@@ -138,7 +138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    moveEvent = event;
 	    emitter.emit(MOVE, event);
 	    if (isDown()) {
-	      emitter.emit(DOWN_MOVE, event);
+	      emitter.emit(DRAG, event);
 	    }
 	  };
 
@@ -192,7 +192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = create;
 	var DOWN = exports.DOWN = 'down';
 	var MOVE = exports.MOVE = 'move';
-	var DOWN_MOVE = exports.DOWN_MOVE = 'downMove';
+	var DRAG = exports.DRAG = 'drag';
 	var UP = exports.UP = 'up';
 	var CANCEL = exports.CANCEL = 'cancel';
 

@@ -67,7 +67,7 @@ const create = (domElement = window) => {
     moveEvent = event
     emitter.emit(MOVE, event)
     if (isDown()) {
-      emitter.emit(DOWN_MOVE, event)
+      emitter.emit(DRAG, event)
     }
   }
 
@@ -106,6 +106,6 @@ export default create
 
 export const DOWN = 'down'
 export const MOVE = 'move'
-export const DOWN_MOVE = 'downMove'
+export const DRAG = 'drag'
 export const UP = 'up'
 export const CANCEL = 'cancel'
