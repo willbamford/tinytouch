@@ -5,7 +5,7 @@ Tiny JavaScript touch library designed to work with mouse and touch devices.
 ## Usage
 
 ```js
-import { DOWN, MOVE, DRAG, UP, CANCEL }, createTouch from 'tinytouch'
+import { DOWN, MOVE, UP, CANCEL, DRAG }, createTouch from 'tinytouch'
 
 const touch = createTouch(document.body)
 const printEvent = (event) => console.log
@@ -42,3 +42,5 @@ Each event has the following properties:
 | `tx`     | Total change in x from initial `DOWN` event (or zero) |
 | `ty`     | Total change in y from initial `DOWN` event (or zero) |
 | `type`   | `Mouse` or `Touch`                                    |
+
+Note `DRAG` is `DOWN` combined with `MOVE`.

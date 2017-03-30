@@ -45,8 +45,10 @@ const create = (domElement = window) => {
   }
 
   const createEventForMouse = (source) => {
-    const x = source.offsetX
-    const y = source.offsetY
+    const target = source.target || source.srcElement
+    const bounds = target.getBoundingClientRect()
+    const x = source.clientX - bounds.left
+    const y = source.clientY - bounds.top
     return createEvent(source, x, y, 'Mouse')
   }
 
